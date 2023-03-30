@@ -54,7 +54,8 @@ model = KubernetesOpsModel.from_k8s_client(k8s_client=kubernetes_api(get_cluster
 toolkit = K8sOperationsToolkit(model=model)
 k8s_agent = create_kubernetes_agent(llm=llm, toolkit=toolkit,  verbose=True)
 
-k8s_agent.run("get the gitlab runner deployment in the gitlab-runner namespace")
+k8s_agent.run("list all namespaces")
+k8s_agent.run("list all services in the test-bed namespace")
 
 
 

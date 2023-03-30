@@ -82,54 +82,54 @@ class KubernetesOpsModel(BaseModel):
     def get_resource_names(self, namespace: str, resource_type: str) -> str:
         """Return a comma separated list of available resources."""
         try:
-            if resource_type == "configmap":
+            if resource_type == "configmap" or resource_type == "configmaps":
                 resource_list = self.core_v1.list_namespaced_config_map(
                     namespace)
-            elif resource_type == "namespace":
+            elif resource_type == "namespace" or resource_type == "namespaces":
                 resource_list = self.core_v1.list_namespace()
-            elif resource_type == "persistentvolume":
+            elif resource_type == "persistentvolume" or resource_type == "persistentvolumes":
                 resource_list = self.core_v1.list_persistent_volume()
-            elif resource_type == "persistentvolumeclaim":
+            elif resource_type == "persistentvolumeclaim" or resource_type == "persistentvolumeclaims":
                 resource_list = self.core_v1.list_namespaced_persistent_volume_claim(
                     namespace)
-            elif resource_type == "pod":
+            elif resource_type == "pod" or resource_type == "pods":
                 resource_list = self.core_v1.list_namespaced_pod(namespace)
-            elif resource_type == "secret":
+            elif resource_type == "secret" or resource_type == "secrets":
                 resource_list = self.core_v1.list_namespaced_secret(namespace)
-            elif resource_type == "serviceaccount":
+            elif resource_type == "serviceaccount" or resource_type == "serviceaccounts":
                 resource_list = self.core_v1.list_namespaced_service_account(
                     namespace)
-            elif resource_type == "service":
+            elif resource_type == "service" or resource_type == "services":
                 resource_list = self.core_v1.list_namespaced_service(namespace)
-            elif resource_type == "node":
+            elif resource_type == "node" or resource_type == "nodes":
                 resource_list = self.core_v1.list_node()
-            elif resource_type == "daemonset":
+            elif resource_type == "daemonset" or resource_type == "daemonsets":
                 resource_list = self.apps_v1.list_namespaced_daemon_set(
                     namespace)
-            elif resource_type == "deployment":
+            elif resource_type == "deployment" or resource_type == "deployments":
                 resource_list = self.apps_v1.list_namespaced_deployment(
                     namespace)
-            elif resource_type == "replicaset":
+            elif resource_type == "replicaset" or resource_type == "replicasets":
                 resource_list = self.apps_v1.list_namespaced_replica_set(
                     namespace)
-            elif resource_type == "statefulset":
+            elif resource_type == "statefulset" or resource_type == "statefulsets":
                 resource_list = self.apps_v1.list_namespaced_stateful_set(
                     namespace)
-            elif resource_type == "job":
+            elif resource_type == "job" or resource_type == "jobs":
                 resource_list = self.batch_v1.list_namespaced_job(namespace)
-            elif resource_type == "cronjob":
+            elif resource_type == "cronjob" or resource_type == "cronjobs":
                 resource_list = self.batch_v1.list_namespaced_cron_job(
                     namespace)
-            elif resource_type == "ingress":
+            elif resource_type == "ingress" or resource_type == "ingresses":
                 resource_list = self.networking_v1.list_namespaced_ingress(
                     namespace)
-            elif resource_type == "clusterrole":
+            elif resource_type == "clusterrole" or resource_type == "clusterroles":
                 resource_list = self.rbac_v1.list_cluster_role()
-            elif resource_type == "clusterrolebinding":
+            elif resource_type == "clusterrolebinding" or resource_type == "clusterrolebindings":
                 resource_list = self.rbac_v1.list_cluster_role_binding()
-            elif resource_type == "role":
+            elif resource_type == "role" or resource_type == "roles":
                 resource_list = self.rbac_v1.list_namespaced_role(namespace)
-            elif resource_type == "rolebinding":
+            elif resource_type == "rolebinding" or resource_type == "rolebindings":
                 resource_list = self.rbac_v1.list_namespaced_role_binding(
                     namespace)
             else:
@@ -140,15 +140,63 @@ class KubernetesOpsModel(BaseModel):
 
     def get_resource(self, namespace: str, resource_type: str, resource_name: str) -> str:
         """Run a get for the specified resource in the specified namespace."""
+        
         try:
-            if resource_type == "service":
+            if resource_type == "configmap" or resource_type == "configmaps":
+                resource = self.core_v1.read_namespaced_config_map(
+                    resource_name, namespace)
+            elif resource_type == "namespace" or resource_type == "namespaces":
+                resource = self.core_v1.read_namespace(resource_name)
+            elif resource_type == "persistentvolume" or resource_type == "persistentvolumes":
+                resource = self.core_v1.read_persistent_volume(resource_name)
+            elif resource_type == "persistentvolumeclaim" or resource_type == "persistentvolumeclaims":
+                resource = self.core_v1.read_namespaced_persistent_volume_claim(
+                    resource_name, namespace)
+            elif resource_type == "pod" or resource_type == "pods":
+                resource = self.core_v1.read_namespaced_pod(
+                    resource_name, namespace)
+            elif resource_type == "secret" or resource_type == "secrets":
+                resource = self.core_v1.read_namespaced_secret(
+                    resource_name, namespace)
+            elif resource_type == "serviceaccount" or resource_type == "serviceaccounts":
+                resource = self.core_v1.read_namespaced_service_account(
+                    resource_name, namespace)
+            elif resource_type == "service" or resource_type == "services":
                 resource = self.core_v1.read_namespaced_service(
                     resource_name, namespace)
-            elif resource_type == "deployment":
+            elif resource_type == "node" or resource_type == "nodes":
+                resource = self.core_v1.read_node(resource_name)
+            elif resource_type == "daemonset" or resource_type == "daemonsets":
+                resource = self.apps_v1.read_namespaced_daemon_set(
+                    resource_name, namespace)
+            elif resource_type == "deployment" or resource_type == "deployments":
                 resource = self.apps_v1.read_namespaced_deployment(
                     resource_name, namespace)
-            elif resource_type == "pod":
-                resource = self.core_v1.read_namespaced_pod(
+            elif resource_type == "replicaset" or resource_type == "replicasets":
+                resource = self.apps_v1.read_namespaced_replica_set(
+                    resource_name, namespace)
+            elif resource_type == "statefulset" or resource_type == "statefulsets":
+                resource = self.apps_v1.read_namespaced_stateful_set(
+                    resource_name, namespace)
+            elif resource_type == "job" or resource_type == "jobs":
+                resource = self.batch_v1.read_namespaced_job(
+                    resource_name, namespace)
+            elif resource_type == "cronjob" or resource_type == "cronjobs":
+                resource = self.batch_v1.read_namespaced_cron_job(
+                    resource_name, namespace)
+            elif resource_type == "ingress" or resource_type == "ingresses":
+                resource = self.networking_v1.read_namespaced_ingress(
+                    resource_name, namespace)
+            elif resource_type == "clusterrole" or resource_type == "clusterroles":
+                resource = self.rbac_v1.read_cluster_role(resource_name)
+            elif resource_type == "clusterrolebinding" or resource_type == "clusterrolebindings":
+                resource = self.rbac_v1.read_cluster_role_binding(
+                    resource_name)
+            elif resource_type == "role" or resource_type == "roles":
+                resource = self.rbac_v1.read_namespaced_role(
+                    resource_name, namespace)
+            elif resource_type == "rolebinding" or resource_type == "rolebindings":
+                resource = self.rbac_v1.read_namespaced_role_binding(
                     resource_name, namespace)
             else:
                 return "Invalid resource type"

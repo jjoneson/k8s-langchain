@@ -2,9 +2,12 @@
 
 ## Capabilities
   - Connect to a remote GKE Cluster
-  - Get a deployment object
-  - Get a service object
-
+  - Supports most of core, apps, batch, networking, and rbac API groups
+    - Specifically: `configmap, namespace, persistentvolume, persistentvolumeclaim, pod ,secret, serviceaccount, service, node, daemonset, deployment, replicaset, statefulset, job, cronjob, ingress, clusterrole, clusterrolebinding, role, rolebinding`
+  - List namespaces
+  - List object names by type in a namespace
+  - Get a resource by name, type, and namespace (if applicable)
+  
 ## Required Env Vars
 |----------------------------|-----------------------------|
 | Name | Description |

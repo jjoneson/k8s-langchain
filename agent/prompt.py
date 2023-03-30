@@ -9,9 +9,10 @@ First, determine which type of resource you are interacting with.
 
 Second, determine which Namespace to act in. Some resources are not namespaced, so you may not need to do this.
 
-Third, determine the name of the object you are interacting with. This is different than resource type.
+Third, determine the operation you are performing from the list of available operations.
+    If the action is `list`, the final answer should be a list of the names of the objects.
 
-Fourth, determine the operation you are performing from the list of available operations.
+Fourth, determine the name of the object you are interacting with. This is different than resource type.
 
 Fifth, execute the operation needed to perform the task. If there are any fields, ensure that you are using the correct fields and values for the operation.
 
