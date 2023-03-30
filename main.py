@@ -4,13 +4,14 @@ import os
 import gitlab
 from langchain.agents import create_openapi_agent
 from langchain.agents.agent_toolkits import OpenAPIToolkit
-from langchain.llms.openai import OpenAI
+from langchain.chat_models import ChatOpenAI
 from langchain.requests import RequestsWrapper
 from langchain.tools.json.tool import JsonSpec
 import googleapiclient.discovery
 from tempfile import NamedTemporaryFile
 from kubernetes import  client
 from slack_sdk import WebClient
+from agent.factory import AgentFactory
 from agent.toolkits.base import create_k8s_engineer_agent
 from agent.toolkits.git_integrator.toolkit import GitIntegratorToolkit
 from agent.toolkits.k8s_explorer.base import create_k8s_explorer_agent
@@ -23,7 +24,7 @@ from tools.gitlab_integration.tool import GitlabModel
 from tools.k8s_explorer.tool import KubernetesOpsModel
 from tools.slack_integration.tool import SlackModel
 
-llm = OpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=1024)
+llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048)
 
 
 def token(*scopes):
@@ -77,11 +78,10 @@ slack_client = WebClient(token=slack_token)
 slack_channel = os.environ["SLACK_CHANNEL_ID"]
 slack_model = SlackModel(client=slack_client, channel=slack_channel)
 
-
 k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=llm, k8s_model=k8s_model, git_model=git_model, gitlab_model=gitlab_model, slack_model=slack_model,  verbose=True)
 k8s_engineer_agent = create_k8s_engineer_agent(llm=llm, toolkit=k8s_engineer_toolkit, verbose=True)
 
-slack_listener = SlackListener(k8s_engineer_agent)
+slack_listener = SlackListener(AgentFactory())
 interrupt = slack_listener.start()
 # block until keyboard interrupt
 interrupt.wait()

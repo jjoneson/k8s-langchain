@@ -1,8 +1,8 @@
 from langchain.agents.agent import AgentExecutor
 
-class AgentListener:
-    def __init__(self, agent: AgentExecutor):
-        self.agent = agent
+from agent.factory import AgentFactory
 
-    def on_message(self, message: str) -> str:
-        return self.agent.run(message)
+class AgentListener:
+    factory: AgentFactory
+    def __init__(self, factory: AgentFactory):
+        self.factory = factory
