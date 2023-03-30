@@ -10,8 +10,6 @@ First, determine which type of resource you are interacting with.
 Second, determine which Namespace to act in. Some resources are not namespaced, so you may not need to do this.
 
 Third, determine the operation you are performing from the list of available operations.
-    If the operation is `list`, the final answer should be a list of the names of the objects.
-    If the operation is `logs`, the final answer should be the logs for the pod.
 
 Fourth, determine the name of the object you are interacting with. This is different than resource type.
 

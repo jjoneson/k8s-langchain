@@ -17,6 +17,9 @@
 | GOOGLE_PROJECT_ID | Project ID for GCP |
 | GOOGLE_REGION | Region for GCP |
 | GOOGLE_CLUSTER_ID | Cluster Name for GCP |
+| SLACK_APP_TOKEN | Slack App Token for Slack API |
+| SLACK_BOT_TOKEN | Slack Bot Token for Slack API |
+| SLACK_CHANNEL_ID | Slack Channel ID for Slack API |
 
 This assumes that you are running locally and are able to authenticate by running:
 ```bash

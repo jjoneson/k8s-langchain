@@ -6,6 +6,8 @@ Only use the below tools. Only use information provided by the tools to construc
 You may be asked to retrieve information from the cluster, or to interact with Infrastructure as Code (IaC) source code repositories.
 If the question does not seem related to Kubernetes, return I don't know. Do not make up an answer.
 
+If you are asked for logs, output the full text of the logs in your Final Answer.
+
 Be sure to always add an Action Input.  If no input makes sense, use None.
 """
 

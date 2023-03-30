@@ -10,15 +10,18 @@ from langchain.tools.json.tool import JsonSpec
 import googleapiclient.discovery
 from tempfile import NamedTemporaryFile
 from kubernetes import  client
+from slack_sdk import WebClient
 from agent.toolkits.base import create_k8s_engineer_agent
 from agent.toolkits.git_integrator.toolkit import GitIntegratorToolkit
 from agent.toolkits.k8s_explorer.base import create_k8s_explorer_agent
 from agent.toolkits.k8s_explorer.toolkit import K8sExplorerToolkit
 from agent.toolkits.toolkit import K8sEngineerToolkit
+from listeners.slack_listener import SlackListener
 from tools.git_integrator.tool import GitModel
 from tools.gitlab_integration.tool import GitlabModel
 
 from tools.k8s_explorer.tool import KubernetesOpsModel
+from tools.slack_integration.tool import SlackModel
 
 llm = OpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=1024)
 
@@ -69,13 +72,23 @@ gitlab_url = os.getenv("GITLAB_URL", "https://gitlab.com")
 gl = gitlab.Gitlab(url=gitlab_url, private_token=gitlab_private_token)
 gitlab_model = GitlabModel(gl=gl)
 
-k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=llm, k8s_model=k8s_model, git_model=git_model, gitlab_model=gitlab_model, verbose=True)
+slack_token = os.environ["SLACK_BOT_TOKEN"]
+slack_client = WebClient(token=slack_token)
+slack_channel = os.environ["SLACK_CHANNEL_ID"]
+slack_model = SlackModel(client=slack_client, channel=slack_channel)
+
+
+k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=llm, k8s_model=k8s_model, git_model=git_model, gitlab_model=gitlab_model, slack_model=slack_model,  verbose=True)
 k8s_engineer_agent = create_k8s_engineer_agent(llm=llm, toolkit=k8s_engineer_toolkit, verbose=True)
 
+slack_listener = SlackListener(k8s_engineer_agent)
+interrupt = slack_listener.start()
+# block until keyboard interrupt
+interrupt.wait()
 
 
-# k8s_agent.run("list all namespaces")
-# k8s_agent.run("list all services in the test-bed namespace")
-# k8s_agent.run("get the gitlab runner deployment in the gitlab-runner namespace")
-k8s_engineer_agent.run("get the logs for review-3 in test-bed")
+# # k8s_agent.run("list all namespaces")
+# # k8s_agent.run("list all services in the test-bed namespace")
+# # k8s_agent.run("get the gitlab runner deployment in the gitlab-runner namespace")
+# k8s_engineer_agent.run("get the logs for review-3 in test-bed")
 

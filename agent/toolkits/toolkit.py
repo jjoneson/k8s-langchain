@@ -20,6 +20,7 @@ from langchain.agents.tools import Tool
 from tools.git_integrator.tool import GitModel
 from tools.gitlab_integration.tool import GitlabModel
 from tools.k8s_explorer.tool import KubernetesOpsModel
+from tools.slack_integration.tool import SlackModel, SlackSendMessageTool
 
 
 class K8sEngineerToolkit(BaseToolkit):
@@ -28,6 +29,7 @@ class K8sEngineerToolkit(BaseToolkit):
     git_agent: AgentExecutor
     gitlab_agent: AgentExecutor
     k8s_explorer_agent: AgentExecutor
+    slack_tool: BaseTool
 
     def get_tools(self) -> List[BaseTool]:
         """Get the tools in the toolkit."""
@@ -46,7 +48,7 @@ class K8sEngineerToolkit(BaseToolkit):
             func=self.gitlab_agent.run,
             description=GITLAB_AGENT_DESCRIPTION,
         )
-        return [git_agent_tool, k8s_explorer_agent_tool, gitlab_agent_tool]
+        return [git_agent_tool, k8s_explorer_agent_tool, gitlab_agent_tool, self.slack_tool]
 
     @classmethod
     def from_llm(
@@ -55,6 +57,7 @@ class K8sEngineerToolkit(BaseToolkit):
         k8s_model: KubernetesOpsModel,
         git_model: GitModel,
         gitlab_model: GitlabModel,
+        slack_model: SlackModel,
         verbose: bool = False,
         **kwargs: Any,
     ) -> K8sEngineerToolkit:
@@ -65,4 +68,5 @@ class K8sEngineerToolkit(BaseToolkit):
             llm=llm, toolkit=K8sExplorerToolkit(model=k8s_model), verbose=verbose, **kwargs)
         gitlab_agent = create_git_integration_toolkit(
             llm=llm, toolkit=GitlabIntegrationToolkit(model=gitlab_model), verbose=verbose, **kwargs)
-        return cls(git_agent=git_agent, k8s_explorer_agent=k8s_explorer_agent, gitlab_agent=gitlab_agent, **kwargs)
+        slack_tool = SlackSendMessageTool(model = slack_model)
+        return cls(git_agent=git_agent, k8s_explorer_agent=k8s_explorer_agent, gitlab_agent=gitlab_agent, slack_tool=slack_tool, **kwargs)

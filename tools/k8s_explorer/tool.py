@@ -417,11 +417,12 @@ class KubernetesGetPodLogsTool(BaseTool):
     """Tool for getting the logs of a pod."""
     name = "k8s_get_pod_logs"
     description = """
+    Can be used to get the logs of a pod.
     You should call the k8s_get_pod_name_like tool first to get the name of the pod.
     You should know the namespace and pod name before calling this tool.
     Executes a get in the specified namespace for the specified pod, with the specified name.
     Input should be a string containing the namespace and pod name, separated by commas.
-    Returns a yaml string containing the spec.
+    Returns the logs of the pod.
     """
     model: KubernetesOpsModel
 
