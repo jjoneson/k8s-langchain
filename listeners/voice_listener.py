@@ -62,6 +62,7 @@ class SpeechCallbackHandler(StdOutCallbackHandler):
         self.voice_lock = threading.Lock()
         try:
             self.engine = pyttsx3.init(driverName="nsss", debug=True)
+            self.engine.setProperty('voice', 'com.apple.voice.compact.en-AU.Karen')
         except Exception as e:
             print(f"Error initializing pyttsx3: {e}")
 
@@ -127,20 +128,18 @@ class SpeechCallbackHandler(StdOutCallbackHandler):
         super().on_agent_action(action, **kwargs)
         # get everything in action.log before "Action:"
         try:
+            l = action.log.split("Action:")
+            if len(l) < 2 or len(l[0]) == 0:
+                return
             if self.engine._inLoop:
                 self.engine.endLoop()
-                time.sleep(0.2)
-            l = action.log.split("Action:")
+                time.sleep(0.5)
             # now get the part after "Thought:"
             # run the next part in a separate thread
-            def say():
-                self.engine.say(l[0])
-                self.engine.runAndWait()
-            t = threading.Thread(target=say)
-            t.start()
+            self.engine.say(l[0])
+            self.engine.runAndWait()
         except Exception as e:
             print(f"Error in on_agent_action: {e}")
-        
             
 
     def on_agent_finish(self, finish: AgentFinish, **kwargs: Any) -> Any:
@@ -149,7 +148,7 @@ class SpeechCallbackHandler(StdOutCallbackHandler):
         try:
             if self.engine._inLoop:
                 self.engine.endLoop()
-                time.sleep(0.2)
+                time.sleep(0.5)
             self.engine.say(finish.log)
             self.engine.runAndWait()
         except Exception as e:
