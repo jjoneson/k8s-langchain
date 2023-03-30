@@ -71,8 +71,7 @@ class SlackListener(AgentListener):
                 # remove the bot mention
                 if req.payload["event"]["type"] == "app_mention":
                     message = message.split(" ", 1)[1]
-                print("calling on_message")
-                self.on_message(req, message)
+                threading.Thread(target=self.on_message(req, message)).start()
                 
 
 def send_slack_text_message(client: SocketModeClient, req: SocketModeRequest, message: str):
