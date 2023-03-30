@@ -6,7 +6,7 @@ from langchain.llms.base import BaseLLM
 from langchain.callbacks.base import BaseCallbackManager
 from langchain.agents.mrkl.base import ZeroShotAgent
 from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS
-from agent.toolkits.git_integrator.pompt import GIT_PREFIX, GIT_SUFFIX
+from agent.toolkits.git_integrator.prompt import GIT_PREFIX, GIT_SUFFIX
 
 from agent.toolkits.git_integrator.toolkit import GitIntegratorToolkit
 

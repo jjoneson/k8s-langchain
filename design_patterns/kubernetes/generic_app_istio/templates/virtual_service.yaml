@@ -1,0 +1,28 @@
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: {app_name}
+  labels:
+    app: {app_name}
+spec:
+  hosts:
+  - {app_name}.{root_domain}
+  gateways:
+  - {gateway_namespace}/{gateway_name}
+  http:
+  - name: "default-route"
+    match:
+    - uri:
+        prefix: /
+    route:
+    - destination:
+        host: {app_name}.{namespace}.svc.cluster.local
+        port:
+          number: {port}
+    headers:
+      response:
+        set:
+          Strict-Transport-Security: max-age=31536000; includeSubDomains
+        remove:
+        - Server
+        - server

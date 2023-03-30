@@ -1,0 +1,1 @@
+"""Design Patterns for various purposes."""

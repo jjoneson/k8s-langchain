@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from typing import Any, List
 from agent.toolkits.git_integrator.base import create_git_integration_toolkit
-from agent.toolkits.git_integrator.pompt import GIT_AGENT_DESCRIPTION
+from agent.toolkits.git_integrator.prompt import GIT_AGENT_DESCRIPTION
 from agent.toolkits.git_integrator.toolkit import GitIntegratorToolkit
 from agent.toolkits.gitlab_integration.prompt import GITLAB_AGENT_DESCRIPTION
 from agent.toolkits.gitlab_integration.toolkit import GitlabIntegrationToolkit
@@ -71,6 +71,8 @@ class K8sEngineerToolkit(BaseToolkit):
         slack_model: SlackModel,
         k8s_sme_model: KubernetesSMEModel,
         callback_manager: BaseCallbackManager = None,
+        slack_channel: str = None,
+        slack_thread_ts: str = None,
         verbose: bool = False,
         **kwargs: Any,
     ) -> K8sEngineerToolkit:
@@ -83,5 +85,5 @@ class K8sEngineerToolkit(BaseToolkit):
             llm=llm, toolkit=GitlabIntegrationToolkit(model=gitlab_model, callback_manager=callback_manager), verbose=verbose, callback_manager=callback_manager, **kwargs)
         k8s_sme_agent = create_k8s_sme_agent(
             llm=llm, toolkit=KubernetesSMEToolkit(model=k8s_sme_model, callback_manager=callback_manager), verbose=verbose, callback_manager=callback_manager, **kwargs)
-        slack_tool = SlackSendMessageTool(model = slack_model, verbose=verbose, callback_manager=callback_manager, **kwargs)
+        slack_tool = SlackSendMessageTool(model = slack_model, channel=slack_channel, thread_ts=slack_thread_ts, verbose=verbose, callback_manager=callback_manager, **kwargs)
         return cls(git_agent=git_agent, k8s_explorer_agent=k8s_explorer_agent, gitlab_agent=gitlab_agent, k8s_sme_agent=k8s_sme_agent, slack_tool=slack_tool, **kwargs)

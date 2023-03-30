@@ -10,7 +10,7 @@ class K8sExplorerToolkit(BaseToolkit):
     """Toolkit for deciding which k8s operation to perform."""
 
     model: KubernetesOpsModel
-    callback_manager: BaseCallbackManager
+    callback_manager: BaseCallbackManager | None
 
     class Config:
         arbitrary_types_allowed = True

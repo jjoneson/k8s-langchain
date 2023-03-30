@@ -26,6 +26,8 @@ class SlackListener(AgentListener):
 
             
     def on_message(self, req: SocketModeRequest, message: str):
+        # reply to the message with an acknowledgement   
+        send_slack_text_message(self.client, req, "Let me think about that...")
         handler = SlackCallbackHandler(self.client, req)
         agent = self.factory.new_k8s_engineer([handler])
         agent({"input": message})
@@ -43,6 +45,7 @@ class SlackListener(AgentListener):
         thread.start()
         return interrupt
 
+    # TODO: Find a way to not handle all requests, but only the ones that are relevant to the bot
     def process(self, client: SocketModeClient, req: SocketModeRequest):
         if req.type == "events_api":
             # Acknowledge the request anyway
@@ -55,20 +58,22 @@ class SlackListener(AgentListener):
                 # ignore messages from the bot itself
                 if req.payload["event"]["user"] == client.web_client.auth_test()["user_id"]:
                     return
-                # client.web_client.reactions_add(
-                #     name="eyes",
-                #     channel=req.payload["event"]["channel"],
-                #     timestamp=req.payload["event"]["ts"],
-                # )
-                
-                # reply to the message with an acknowledgement   
-                send_slack_text_message(client, req, "Let me think about that...")
                 
                 message = req.payload["event"]["text"]
                 # remove the bot mention
                 if req.payload["event"]["type"] == "app_mention":
                     message = message.split(" ", 1)[1]
                 threading.Thread(target=self.on_message(req, message)).start()
+
+class SlackThread:
+    thread_ts: str = None
+    channel: str = None
+    lock: threading.Lock
+
+    def __init__(self, channel: str, thread_ts: str):
+        self.channel = channel
+        self.thread_ts = thread_ts
+        self.lock = threading.Lock()
                 
 
 def send_slack_text_message(client: SocketModeClient, req: SocketModeRequest, message: str):

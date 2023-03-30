@@ -134,7 +134,7 @@ class GitRepositoryCreateBranchTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool"""
-        local_repository_path, branch_name = tool_input.split(',')
+        local_repository_path, branch_name = tool_input.split(',', 1)
         # clean spaces
         local_repository_path = local_repository_path.strip()
         branch_name = branch_name.strip()
@@ -156,7 +156,7 @@ class GitRepositoryCheckoutBranchTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool"""
-        local_repository_path, branch_name = tool_input.split(',')
+        local_repository_path, branch_name = tool_input.split(',', 1)
         # clean spaces
         local_repository_path = local_repository_path.strip()
         branch_name = branch_name.strip()
@@ -214,7 +214,7 @@ class GitRepositoryAddFileTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool"""
-        local_repository_path, file_path = tool_input.split(',')
+        local_repository_path, file_path = tool_input.split(',', 1)
         # clean spaces
         local_repository_path = local_repository_path.strip()
         file_path = file_path.strip()
@@ -236,7 +236,7 @@ class GitRepositoryCommitTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool"""
-        local_repository_path, message = tool_input.split(',')
+        local_repository_path, message = tool_input.split(',', 1)
         # clean spaces
         local_repository_path = local_repository_path.strip()
         return self.model.commit(local_repository_path, message)
@@ -279,7 +279,7 @@ class GitRepositoryWriteFileTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool"""
-        local_repository_path, file_path, content = tool_input.split(',')
+        local_repository_path, file_path, content = tool_input.split(',', 2)
         # clean spaces
         local_repository_path = local_repository_path.strip()
         file_path = file_path.strip()

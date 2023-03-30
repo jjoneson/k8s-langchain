@@ -1,0 +1,1 @@
+"""Tools for writing code from design patterns."""

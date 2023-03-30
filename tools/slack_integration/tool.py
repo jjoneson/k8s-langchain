@@ -5,20 +5,19 @@ from pydantic import BaseModel
 class SlackModel(BaseModel):
     """Model for slack integration."""
     client: WebClient
-    channel: str
 
     class Config:
         arbitrary_types_allowed = True
 
     @classmethod
-    def from_client(cls, client: WebClient, channel: str):
+    def from_client(cls, client: WebClient):
         """Create a model from a client."""
-        return cls(client=client, channel=channel)
+        return cls(client=client)
     
-    def send_message(self, message: str) -> str:
+    def send_message(self, message: str, channel: str, thread_ts: str | None = None) -> str:
         """Send a message to slack."""
         try: 
-            self.client.chat_postMessage(channel=self.channel, text=message)
+            self.client.chat_postMessage(channel=channel, text=message, thread_ts=thread_ts)
             return "Message sent"
         except Exception as e:
             return f"Error sending slack message: {e}"
@@ -32,14 +31,16 @@ class SlackSendMessageTool(BaseTool):
     Input should be a string.
     """
     model: SlackModel
+    thread_ts: str | None = None
+    channel: str | None = None
 
     def _run(self, tool_input: str) -> str:
         """Send a message to slack."""
         # the input has newlines as literal \n, so we need to replace them with actual newlines
         tool_input = tool_input.replace("\\n", "\n")
-        return self.model.send_message(tool_input)
+        return self.model.send_message(tool_input, self.channel, self.thread_ts)
     
     async def _arun(self, tool_input: str) -> str:
         """Send a message to slack."""
-        return self.run(tool_input)
+        return self._run(tool_input)
     

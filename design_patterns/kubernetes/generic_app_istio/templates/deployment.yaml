@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {app_name}
+  labels:
+    app: {app_name}
+spec:
+  replicas: {replicas}
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: {app_name}
+  template:
+    metadata:
+      labels:
+        app: {app_name}
+    spec:
+      securityContext:
+        fsGroup: 1000
+      serviceAccountName: {app_name}
+      containers:
+      - name: {app_name}
+        image: {image}
+        ports:
+        - containerPort: {port}
+        resources:
+          requests:
+            cpu: {cpu}
+            memory: {memory}
+          limits:
+            cpu: {cpu}
+            memory: {memory}
+        env:
+        - name: {env_name}
+          value: {env_value}
+        envFrom:
+        - secretRef:
+            name: {secret_name}
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsNonRoot: true
+          runAsUser: 1000
+          runAsGroup: 1000
+          capabilities:
+            drop:
+            - ALL
+        
+        

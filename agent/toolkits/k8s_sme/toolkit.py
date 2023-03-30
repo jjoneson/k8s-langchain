@@ -10,7 +10,7 @@ class KubernetesSMEToolkit(BaseToolkit):
     """Toolkit for interacting with git repositories."""
 
     model: KubernetesSMEModel
-    callback_manager: BaseCallbackManager
+    callback_manager: BaseCallbackManager | None
 
     class Config:
         arbitrary_types_allowed = True

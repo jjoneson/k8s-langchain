@@ -1,0 +1,20 @@
+api: v1
+kind: Service
+metadata:
+  name: {app_name}
+  labels:
+    app: {app_name}
+spec:
+  type: ClusterIP
+  ports:
+  - port: {port}
+    targetPort: {port}
+    protocol: TCP
+    name: http
+  - port: 80
+    targetPort: {port}
+    protocol: TCP
+    name: http-80
+  selector:
+    app: {app_name}
+  sessionAffinity: None

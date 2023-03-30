@@ -10,7 +10,7 @@ class GitlabIntegrationToolkit(BaseToolkit):
     """Toolkit for interacting with gitlab."""
 
     model: GitlabModel
-    callback_manager: BaseCallbackManager
+    callback_manager: BaseCallbackManager | None
     
     class Config:
         arbitrary_types_allowed = True
