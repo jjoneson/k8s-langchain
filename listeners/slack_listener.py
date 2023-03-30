@@ -27,10 +27,7 @@ class SlackListener(AgentListener):
             
     def on_message(self, req: SocketModeRequest, message: str):
         handler = SlackCallbackHandler(self.client, req)
-        agent = self.factory.new_k8s_engineer()
-        agent.callback_manager.add_handler(
-            handler
-        )
+        agent = self.factory.new_k8s_engineer([handler])
         agent({"input": message})
         del agent
 

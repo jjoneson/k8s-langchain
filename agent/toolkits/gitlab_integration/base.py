@@ -36,4 +36,4 @@ def create_gitlab_integration_toolkit(
     tool_names = [tool.name for tool in tools]
     agent = ZeroShotAgent(llm_chain=llm_chain,
                           allowed_tools=tool_names, **kwargs)
-    return AgentExecutor.from_agent_and_tools(agent=agent, tools=toolkit.get_tools(), verbose=verbose)
+    return AgentExecutor.from_agent_and_tools(agent=agent, tools=toolkit.get_tools(), verbose=verbose, callback_manager=callback_manager)

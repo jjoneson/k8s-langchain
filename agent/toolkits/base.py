@@ -36,5 +36,5 @@ def create_k8s_engineer_agent(
     tool_names = [tool.name for tool in tools]
     agent = ZeroShotAgent(llm_chain=llm_chain,
                           allowed_tools=tool_names, return_intermediate_steps=True, **kwargs)
-    return AgentExecutor.from_agent_and_tools(agent=agent, tools=toolkit.get_tools(), verbose=verbose, return_intermediate_steps=True,)
+    return AgentExecutor.from_agent_and_tools(agent=agent, tools=toolkit.get_tools(), verbose=verbose, callback_manager=callback_manager, return_intermediate_steps=True,)
     

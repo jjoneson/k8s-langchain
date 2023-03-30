@@ -1,6 +1,6 @@
 import base64
 import os
-from typing import Any
+from typing import Any, List
 import gitlab
 import googleapiclient.discovery
 from kubernetes import  client
@@ -15,18 +15,12 @@ from tools.k8s_explorer.tool import KubernetesOpsModel
 from tools.slack_integration.tool import SlackModel
 from langchain.chat_models import ChatOpenAI
 from langchain.agents.agent import AgentExecutor
+from langchain.callbacks.base import CallbackManager, BaseCallbackHandler
 
 
 
 class AgentFactory:
-    k8s_model: KubernetesOpsModel
-    git_model: GitModel
-    slack_model: SlackModel
-    gitlab_model: GitlabModel
-    llm: Any
     def __init__(self):
-        self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048)
-
         self.k8s_model = KubernetesOpsModel.from_k8s_client(k8s_client=kubernetes_api(get_cluster()))
 
         git_username = os.getenv("GIT_USERNAME", "k8s-engineer")
@@ -45,9 +39,14 @@ class AgentFactory:
         slack_channel = os.environ["SLACK_CHANNEL_ID"]
         self.slack_model = SlackModel(client=slack_client, channel=slack_channel)
     
-    def new_k8s_engineer(self) -> AgentExecutor:
-        k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=self.llm, k8s_model=self.k8s_model, git_model=self.git_model, gitlab_model=self.gitlab_model, slack_model=self.slack_model,  verbose=True)
-        return create_k8s_engineer_agent(llm=self.llm, toolkit = k8s_engineer_toolkit, verbose=True)
+        self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048)
+
+    def new_k8s_engineer(self, handlers: List[BaseCallbackHandler]) -> AgentExecutor:
+        
+
+        cm = CallbackManager(handlers=handlers)
+        k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=self.llm, k8s_model=self.k8s_model, git_model=self.git_model, gitlab_model=self.gitlab_model, slack_model=self.slack_model, callback_manager=cm,  verbose=True)
+        return create_k8s_engineer_agent(llm=self.llm, toolkit = k8s_engineer_toolkit, callback_manager=cm, verbose=True)
         
     
 def gcp_token(*scopes):
