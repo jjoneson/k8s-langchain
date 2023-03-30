@@ -27,16 +27,16 @@ gcloud auth application-default login
 k8s_agent.run("get the gitlab runner deployment in the gitlab-runner namespace")
 ```
 
-```bash
+```yaml
 > Entering new AgentExecutor chain...
 Action: k8s_get_object_names
 Action Input: "gitlab-runner,deployment"
 Observation: gitlab-runner
-Thought:I should determine the operation I need to perform.
+Thought: I should determine the operation I need to perform.
 Action: k8s_determine_operations
 Action Input: "deployment"
 Observation: create,read,list,update,delete
-Thought:I need to perform a get operation on the deployment.
+Thought: I need to perform a get operation on the deployment.
 Action: k8s_get_resource
 Action Input: "gitlab-runner,deployment,gitlab-runner"
 Observation: api_version: apps/v1
@@ -62,3 +62,31 @@ spec:
 ...
 ```
 
+```python
+k8s_agent.run("list all namespaces")
+k8s_agent.run("list all services in the test-bed namespace")
+```
+```yaml
+> Entering new AgentExecutor chain...
+Action: k8s_get_available_resource_types
+Action Input: None
+Observation: configmap,namespace,persistentvolume,persistentvolumeclaim,pod,secret,serviceaccount,service,node,daemonset,deployment,replicaset,statefulset,job,cronjob,ingress,clusterrole,clusterrolebinding,role,rolebinding
+Thought: I need to list all namespaces, so I should use the k8s_get_available_namespaces tool.
+Action: k8s_get_available_namespaces
+Action Input: None
+Observation: cert-manager,default,gitlab-agent,gitlab-managed-apps,gitlab-runner,gitlab-webhook-dev,kube-node-lease,kube-public,kube-system,test-bed
+Thought: I now have a comma separated list of all available namespaces.
+Final Answer: cert-manager,default,gitlab-agent,gitlab-managed-apps,gitlab-runner,gitlab-webhook-dev,kube-node-lease,kube-public,kube-system,test-bed
+
+> Finished chain.
+
+
+> Entering new AgentExecutor chain...
+Action: k8s_get_object_names
+Action Input: "test-bed,service"
+Observation: review-1-initial-hqmue1-auto-deploy,review-3-initial-e0a0ju-auto-deploy,review-3-initial-e0a0ju-postgresql,review-3-initial-e0a0ju-postgresql-headless
+Thought: I now know the names of all services in the test-bed namespace.
+Final Answer: review-1-initial-hqmue1-auto-deploy,review-3-initial-e0a0ju-auto-deploy,review-3-initial-e0a0ju-postgresql,review-3-initial-e0a0ju-postgresql-headless
+
+> Finished chain.
+```
