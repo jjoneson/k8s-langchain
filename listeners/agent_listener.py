@@ -1,5 +1,3 @@
-from langchain.agents.agent import AgentExecutor
-
 from agent.factory import AgentFactory
 
 class AgentListener:

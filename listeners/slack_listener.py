@@ -8,7 +8,6 @@ from slack_sdk.socket_mode.response import SocketModeResponse
 from slack_sdk.socket_mode.request import SocketModeRequest
 from agent.factory import AgentFactory
 from listeners.agent_listener import AgentListener
-from langchain.agents.agent import AgentExecutor
 from langchain.callbacks import BaseCallbackHandler
 from langchain.schema import AgentAction, AgentFinish, LLMResult
 
@@ -149,7 +148,6 @@ class SlackCallbackHandler(BaseCallbackHandler):
     client: SocketModeClient
     req: SocketModeRequest
     def __init__(self, client: SocketModeClient, req: SocketModeRequest):
-        print("initializing SlackCallbackHandler")
         self.client = client
         self.req = req
 

@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import List
 from tools.k8s_explorer.tool import KubernetesGetAvailableNamespacesTool, KubernetesGetAvailableOperationsTool, KubernetesGetObjectNamesTool, KubernetesGetAvailableResourceTypesTool, KubernetesGetPodLogsTool, KubernetesGetPodNameLikeTool, KubernetesGetResourceTool, KubernetesOpsModel
 
 from langchain.agents.agent_toolkits.base import BaseToolkit

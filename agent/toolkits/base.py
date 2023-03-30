@@ -7,8 +7,6 @@ from langchain.callbacks.base import BaseCallbackManager
 from langchain.agents.mrkl.base import ZeroShotAgent
 from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS
 
-from agent.toolkits.git_integrator.toolkit import GitIntegratorToolkit
-from agent.toolkits.k8s_explorer.toolkit import K8sExplorerToolkit
 from agent.toolkits.prompt import K8S_ENGINEER_PREFIX, K8S_ENGINEER_SUFFIX
 from agent.toolkits.toolkit import K8sEngineerToolkit
 
