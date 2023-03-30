@@ -4,14 +4,16 @@
 
 For indexing PDFs:
 - poppler
+For voice recognition:
+- portaudio
 
 on Mac:
 ```bash
-brew install poppler
+brew install poppler portaudio
 ```
 on Ubuntu:
 ```bash
-sudo apt-get install poppler-utils
+sudo apt-get install poppler-utils python3-pyaudio
 ```
 
 ## Capabilities
