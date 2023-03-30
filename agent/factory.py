@@ -42,8 +42,6 @@ class AgentFactory:
         self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048)
 
     def new_k8s_engineer(self, handlers: List[BaseCallbackHandler]) -> AgentExecutor:
-        
-
         cm = CallbackManager(handlers=handlers)
         k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=self.llm, k8s_model=self.k8s_model, git_model=self.git_model, gitlab_model=self.gitlab_model, slack_model=self.slack_model, callback_manager=cm,  verbose=True)
         return create_k8s_engineer_agent(llm=self.llm, toolkit = k8s_engineer_toolkit, callback_manager=cm, verbose=True)

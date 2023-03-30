@@ -65,10 +65,10 @@ class K8sEngineerToolkit(BaseToolkit):
     ) -> K8sEngineerToolkit:
         """Create a toolkit from an LLM."""
         git_agent = create_git_integration_toolkit(
-            llm=llm, toolkit=GitIntegratorToolkit(model=git_model), verbose=verbose, callback_manager=callback_manager, **kwargs)
+            llm=llm, toolkit=GitIntegratorToolkit(model=git_model, callback_manager=callback_manager), verbose=verbose, callback_manager=callback_manager, **kwargs)
         k8s_explorer_agent = create_k8s_explorer_agent(
-            llm=llm, toolkit=K8sExplorerToolkit(model=k8s_model), verbose=verbose, callback_manager=callback_manager, **kwargs)
+            llm=llm, toolkit=K8sExplorerToolkit(model=k8s_model, callback_manager=callback_manager), verbose=verbose, callback_manager=callback_manager, **kwargs)
         gitlab_agent = create_git_integration_toolkit(
-            llm=llm, toolkit=GitlabIntegrationToolkit(model=gitlab_model), verbose=verbose, callback_manager=callback_manager, **kwargs)
-        slack_tool = SlackSendMessageTool(model = slack_model)
+            llm=llm, toolkit=GitlabIntegrationToolkit(model=gitlab_model, callback_manager=callback_manager), verbose=verbose, callback_manager=callback_manager, **kwargs)
+        slack_tool = SlackSendMessageTool(model = slack_model, verbose=verbose, callback_manager=callback_manager, **kwargs)
         return cls(git_agent=git_agent, k8s_explorer_agent=k8s_explorer_agent, gitlab_agent=gitlab_agent, slack_tool=slack_tool, **kwargs)
