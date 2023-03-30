@@ -2,3 +2,5 @@ langchain
 kubernetes
 google-api-python-client
 google-api-client
+pygit2
+python-gitlab

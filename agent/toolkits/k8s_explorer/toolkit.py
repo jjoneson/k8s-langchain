@@ -1,11 +1,11 @@
-from typing import List
-from tools.k8s_operations.tool import KubernetesCreateNamespaceTool, KubernetesGetAvailableNamespacesTool, KubernetesGetAvailableOperationsTool, KubernetesGetObjectNamesTool, KubernetesGetAvailableResourceTypesTool, KubernetesGetPodLogsTool, KubernetesGetPodNameLikeTool, KubernetesGetResourceTool, KubernetesOpsModel
+from typing import Any, List
+from tools.k8s_explorer.tool import KubernetesGetAvailableNamespacesTool, KubernetesGetAvailableOperationsTool, KubernetesGetObjectNamesTool, KubernetesGetAvailableResourceTypesTool, KubernetesGetPodLogsTool, KubernetesGetPodNameLikeTool, KubernetesGetResourceTool, KubernetesOpsModel
 
 from langchain.agents.agent_toolkits.base import BaseToolkit
 from langchain.tools import BaseTool
 
     
-class K8sOperationsToolkit(BaseToolkit):
+class K8sExplorerToolkit(BaseToolkit):
     """Toolkit for deciding which k8s operation to perform."""
 
     model: KubernetesOpsModel
@@ -21,3 +21,4 @@ class K8sOperationsToolkit(BaseToolkit):
             KubernetesGetAvailableOperationsTool(model=self.model),
             KubernetesGetResourceTool(model=self.model),
         ]
+    

@@ -1,1 +1,1 @@
-"""Kubernetes agent."""
+"""Agent that behaves as a Kubernetes Engineer"""

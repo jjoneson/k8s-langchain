@@ -1,6 +1,7 @@
 import base64
 import json
 import os
+import gitlab
 from langchain.agents import create_openapi_agent
 from langchain.agents.agent_toolkits import OpenAPIToolkit
 from langchain.llms.openai import OpenAI
@@ -9,10 +10,15 @@ from langchain.tools.json.tool import JsonSpec
 import googleapiclient.discovery
 from tempfile import NamedTemporaryFile
 from kubernetes import  client
-from agent.base import create_kubernetes_agent
-from agent.toolkit import K8sOperationsToolkit
+from agent.toolkits.base import create_k8s_engineer_agent
+from agent.toolkits.git_integrator.toolkit import GitIntegratorToolkit
+from agent.toolkits.k8s_explorer.base import create_k8s_explorer_agent
+from agent.toolkits.k8s_explorer.toolkit import K8sExplorerToolkit
+from agent.toolkits.toolkit import K8sEngineerToolkit
+from tools.git_integrator.tool import GitModel
+from tools.gitlab_integration.tool import GitlabModel
 
-from tools.k8s_operations.tool import KubernetesOpsModel
+from tools.k8s_explorer.tool import KubernetesOpsModel
 
 llm = OpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=1024)
 
@@ -50,13 +56,26 @@ def get_cluster():
     return cluster
 
 
-model = KubernetesOpsModel.from_k8s_client(k8s_client=kubernetes_api(get_cluster()))
-toolkit = K8sOperationsToolkit(model=model)
-k8s_agent = create_kubernetes_agent(llm=llm, toolkit=toolkit,  verbose=True)
+k8s_model = KubernetesOpsModel.from_k8s_client(k8s_client=kubernetes_api(get_cluster()))
+
+git_username = os.getenv("GIT_USERNAME", "k8s-engineer")
+git_password = os.getenv("GIT_PASSWORD", "dummy-password")
+git_model = GitModel(username=git_username, password=git_password)
 
 
-k8s_agent.run("list all namespaces")
-k8s_agent.run("list all services in the test-bed namespace")
-k8s_agent.run("get the gitlab runner deployment in the gitlab-runner namespace")
-k8s_agent.run("get the logs for review-3 in test-bed")
+gitlab_private_token = os.getenv("GITLAB_PRIVATE_TOKEN", "dummy-token")
+gitlab_url = os.getenv("GITLAB_URL", "https://gitlab.com")
+
+gl = gitlab.Gitlab(url=gitlab_url, private_token=gitlab_private_token)
+gitlab_model = GitlabModel(gl=gl)
+
+k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=llm, k8s_model=k8s_model, git_model=git_model, gitlab_model=gitlab_model, verbose=True)
+k8s_engineer_agent = create_k8s_engineer_agent(llm=llm, toolkit=k8s_engineer_toolkit, verbose=True)
+
+
+
+# k8s_agent.run("list all namespaces")
+# k8s_agent.run("list all services in the test-bed namespace")
+# k8s_agent.run("get the gitlab runner deployment in the gitlab-runner namespace")
+k8s_engineer_agent.run("get the logs for review-3 in test-bed")
 

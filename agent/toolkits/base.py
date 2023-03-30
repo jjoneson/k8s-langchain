@@ -6,23 +6,24 @@ from langchain.llms.base import BaseLLM
 from langchain.callbacks.base import BaseCallbackManager
 from langchain.agents.mrkl.base import ZeroShotAgent
 from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS
-from agent.prompt import K8S_PREFIX, K8S_SUFFIX
 
-from agent.toolkit import K8sOperationsToolkit
+from agent.toolkits.git_integrator.toolkit import GitIntegratorToolkit
+from agent.toolkits.k8s_explorer.toolkit import K8sExplorerToolkit
+from agent.toolkits.prompt import K8S_ENGINEER_PREFIX, K8S_ENGINEER_SUFFIX
+from agent.toolkits.toolkit import K8sEngineerToolkit
 
-
-def create_kubernetes_agent(
+def create_k8s_engineer_agent(
         llm: BaseLLM,
-        toolkit: K8sOperationsToolkit,
+        toolkit: K8sEngineerToolkit,
         callback_manager: Optional[BaseCallbackManager] = None,
-        prefix: str = K8S_PREFIX,
-        suffix: str = K8S_SUFFIX,
+        prefix: str = K8S_ENGINEER_PREFIX,
+        suffix: str = K8S_ENGINEER_SUFFIX,
         format_instructions: str = FORMAT_INSTRUCTIONS,
         input_variables: Optional[List[str]] = None,
         verbose: bool = False,
         **kwargs: Any,
 ) -> AgentExecutor:
-    """Create an agent for interacting with a kubernetes cluster."""
+    """Create an agent for performing kubernetes engineering tasks."""
     tools = toolkit.get_tools()
     prompt = ZeroShotAgent.create_prompt(tools=tools,
                                          prefix=prefix,

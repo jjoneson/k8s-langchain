@@ -10,7 +10,8 @@ First, determine which type of resource you are interacting with.
 Second, determine which Namespace to act in. Some resources are not namespaced, so you may not need to do this.
 
 Third, determine the operation you are performing from the list of available operations.
-    If the action is `list`, the final answer should be a list of the names of the objects.
+    If the operation is `list`, the final answer should be a list of the names of the objects.
+    If the operation is `logs`, the final answer should be the logs for the pod.
 
 Fourth, determine the name of the object you are interacting with. This is different than resource type.
 
@@ -25,9 +26,9 @@ Question: {input}
 Thought: I should determine the type of resource I am interacting with.
 {agent_scratchpad}"""
 
-DESCRIPTION = """Can be used to answer qustions about Kubernetes resources. Always use this tool before trying to interact with a Kubernetes resource.
+K8S_EXPLORER_AGENT_DESCRIPTION = """Can be used to answer questions about Kubernetes resources in a running kubernetes cluster.
 Example inputs to this tool:
-  'What options are available when creating a pod?'
-  'What options are available when creating a deployment?'
+  'get the gitlab runner deployment in the gitlab-runner namespace'
+  'get the logs for review-3 in test-bed'
 Always use the exact names of the namespace, resources and operations when interacting with this tool.
 """
