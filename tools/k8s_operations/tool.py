@@ -399,9 +399,10 @@ class KubernetesGetPodNameLikeTool(BaseTool):
     def _run(self, tool_input: str) -> str:
         """Run the tool."""
         namespace, pod_name = tool_input.split(",")
+        # remove spaces
+        pod_name = pod_name.replace(" ", "")
         resources = self.model.get_resource_list(namespace, "pods")
         resource_names = ",".join([i.metadata.name for i in resources])
-        print(resource_names)
 
         for name in resource_names.split(","):
             if name.startswith(pod_name):

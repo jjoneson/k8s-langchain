@@ -58,5 +58,5 @@ k8s_agent = create_kubernetes_agent(llm=llm, toolkit=toolkit,  verbose=True)
 k8s_agent.run("list all namespaces")
 k8s_agent.run("list all services in the test-bed namespace")
 k8s_agent.run("get the gitlab runner deployment in the gitlab-runner namespace")
-k8s_agent.run("get the logs for the review-3 pod in test-bed")
+k8s_agent.run("get the logs for review-3 in test-bed")
 

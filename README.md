@@ -93,7 +93,7 @@ Final Answer: review-1-initial-hqmue1-auto-deploy,review-3-initial-e0a0ju-auto-d
 ```
 
 ```python
-k8s_agent.run("get the logs for the review-3 pod in test-bed")
+k8s_agent.run("get the logs for review-3 in test-bed")
 ```
 ```yaml
 > Entering new AgentExecutor chain...
