@@ -7,6 +7,7 @@
   - List namespaces
   - List object names by type in a namespace
   - Get a resource by name, type, and namespace (if applicable)
+  - Get logs for a pod by name prefix and namespace
   
 ## Required Env Vars
 | Name | Description |
@@ -89,4 +90,40 @@ Thought: I now know the names of all services in the test-bed namespace.
 Final Answer: review-1-initial-hqmue1-auto-deploy,review-3-initial-e0a0ju-auto-deploy,review-3-initial-e0a0ju-postgresql,review-3-initial-e0a0ju-postgresql-headless
 
 > Finished chain.
+```
+
+```python
+k8s_agent.run("get the logs for the review-3 pod in test-bed")
+```
+```yaml
+> Entering new AgentExecutor chain...
+Action: k8s_get_pod_logs
+Action Input: test-bed, review-3
+Observation: postgresql 21:24:28.14 
+postgresql 21:24:28.14 Welcome to the Bitnami postgresql container
+postgresql 21:24:28.14 Subscribe to project updates by watching https://github.com/bitnami/bitnami-docker-postgresql
+postgresql 21:24:28.15 Submit issues and feature requests at https://github.com/bitnami/bitnami-docker-postgresql/issues
+postgresql 21:24:28.15 Send us your feedback at containers@bitnami.com
+postgresql 21:24:28.15 
+postgresql 21:24:28.17 INFO  ==> ** Starting PostgreSQL setup **
+postgresql 21:24:28.25 INFO  ==> Validating settings in POSTGRESQL_* env vars..
+postgresql 21:24:28.26 INFO  ==> Loading custom pre-init scripts...
+postgresql 21:24:28.26 INFO  ==> Initializing PostgreSQL database...
+postgresql 21:24:28.28 INFO  ==> postgresql.conf file not detected. Generating it...
+postgresql 21:24:28.29 INFO  ==> pg_hba.conf file not detected. Generating it...
+postgresql 21:24:28.29 INFO  ==> Generating local authentication configuration
+postgresql 21:24:28.30 INFO  ==> Deploying PostgreSQL with persisted data...
+postgresql 21:24:28.31 INFO  ==> Configuring replication parameters
+postgresql 21:24:28.33 INFO  ==> Configuring fsync
+postgresql 21:24:28.34 INFO  ==> Loading custom scripts...
+postgresql 21:24:28.35 INFO  ==> Enabling remote connections
+postgresql 21:24:28.36 INFO  ==> Stopping PostgreSQL...
+postgresql 21:24:28.37 INFO  ==> ** PostgreSQL setup finished! **
+
+postgresql 21:24:28.43 INFO  ==> ** Starting PostgreSQL **
+LOG:  database system was shut down at 2023-03-26 21:21:58 GMT
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+...
 ```

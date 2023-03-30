@@ -9,7 +9,7 @@ class KubernetesOpsModel(BaseModel):
     """Base Representation of a Kubernetes Operation."""
     """The fact of the matter is, the kubernetes API spec is way too large to be useful within the context window of an LLM, so we have to wrap it."""
 
-    available_operations = ["create", "read", "list", "update", "delete"]
+    available_operations = ["create", "read", "list", "update", "delete", "logs"]
     core_v1_resource_types = [
         "configmap",
         "namespace",
@@ -69,6 +69,16 @@ class KubernetesOpsModel(BaseModel):
         """Return a comma separated list of available namespaces."""
         namespace_list = self.core_v1.list_namespace()
         return ",".join([namespace.metadata.name for namespace in namespace_list.items])
+    
+    def get_logs(self, namespace: str, pod_name: str) -> str:
+        """Get the logs for a pod."""
+        # remove spaces
+        namespace = namespace.replace(" ", "")
+        pod_name = pod_name.replace(" ", "")
+        try:
+            return self.core_v1.read_namespaced_pod_log(pod_name, namespace, tail_lines=50)
+        except Exception as e:
+            return f"Error getting logs for pod {pod_name} in {namespace}: {e}"
 
     def create_namespace(self, namespace: str) -> str:
         """Create a new namespace."""
@@ -79,8 +89,11 @@ class KubernetesOpsModel(BaseModel):
         except Exception as e:
             return f"Error: {e}"
 
-    def get_resource_names(self, namespace: str, resource_type: str) -> str:
-        """Return a comma separated list of available resources."""
+    def get_resource_list(self, namespace: str, resource_type: str) -> List[Any]:
+        """Get a list of resources of a given type in a given namespace."""
+        # remove spaces
+        resource_type = resource_type.replace(" ", "")
+        namespace = namespace.replace(" ", "")
         try:
             if resource_type == "configmap" or resource_type == "configmaps":
                 resource_list = self.core_v1.list_namespaced_config_map(
@@ -134,12 +147,29 @@ class KubernetesOpsModel(BaseModel):
                     namespace)
             else:
                 return "Invalid resource type"
-            return ",".join([resource.metadata.name for resource in resource_list.items])
+            return resource_list.items
+        except Exception as e:
+            return f"Error getting object names for {resource_type} in {namespace}: {e}"
+        
+    def get_running_pod_names(self, pods: List[Any]) -> str:
+        """Return a comma separated list of running pods."""
+        return ",".join([pod.metadata.name for pod in pods if pod.status.phase == "Running"])
+
+    def get_resource_names(self, namespace: str, resource_type: str) -> str:
+        """Return a comma separated list of available resources."""
+        # remove spaces
+        resource_type = resource_type.replace(" ", "")
+        namespace = namespace.replace(" ", "")
+        try:
+            return ",".join([resource.metadata.name for resource in self.get_resource_list(namespace, resource_type)])
         except Exception as e:
             return f"Error getting object names for {resource_type} in {namespace}: {e}"
 
     def get_resource(self, namespace: str, resource_type: str, resource_name: str) -> str:
         """Run a get for the specified resource in the specified namespace."""
+        # remove spaces
+        resource_type = resource_type.replace(" ", "")
+        namespace = namespace.replace(" ", "")
         
         try:
             if resource_type == "configmap" or resource_type == "configmaps":
@@ -350,6 +380,63 @@ class KubernetesGetResourceTool(BaseTool):
         """Run the tool."""
         namespace, resource_type, resource_name = tool_input.split(",")
         return self.model.get_resource(namespace, resource_type, resource_name)
+
+    async def _arun(self, tool_input: str) -> str:
+        """Run the tool."""
+        return self._run(tool_input)
+    
+class KubernetesGetPodNameLikeTool(BaseTool):
+    """Tool for getting a pod with a name like the input."""
+    name = "k8s_get_pod_name_like"
+    description = """
+    You should know the namespace and pod name before calling this tool.
+    Executes a get in the specified namespace for the specified pod, with the specified name.
+    Input should be a string containing the namespace and pod name, separated by commas.
+    Returns a yaml string containing the spec.
+    """
+    model: KubernetesOpsModel
+
+    def _run(self, tool_input: str) -> str:
+        """Run the tool."""
+        namespace, pod_name = tool_input.split(",")
+        resources = self.model.get_resource_list(namespace, "pods")
+        resource_names = ",".join([i.metadata.name for i in resources])
+        print(resource_names)
+
+        for name in resource_names.split(","):
+            if name.startswith(pod_name):
+                return name
+        return "No pod found with name like: " + pod_name
+
+    async def _arun(self, tool_input: str) -> str:
+        """Run the tool."""
+        return self._run(tool_input)
+
+class KubernetesGetPodLogsTool(BaseTool):
+    """Tool for getting the logs of a pod."""
+    name = "k8s_get_pod_logs"
+    description = """
+    You should call the k8s_get_pod_name_like tool first to get the name of the pod.
+    You should know the namespace and pod name before calling this tool.
+    Executes a get in the specified namespace for the specified pod, with the specified name.
+    Input should be a string containing the namespace and pod name, separated by commas.
+    Returns a yaml string containing the spec.
+    """
+    model: KubernetesOpsModel
+
+    def _run(self, tool_input: str) -> str:
+        """Run the tool."""
+        namespace, pod_name = tool_input.split(",")
+        resources = self.model.get_resource_list(namespace, "pods")
+        resource_names = self.model.get_running_pod_names(resources)
+        # remove spaces
+        pod_name = pod_name.replace(" ", "")
+        for name in resource_names.split(","):
+            if name.startswith(pod_name):
+                pod_name = name
+            else:
+                return "No pod found with name like: " + pod_name
+        return self.model.get_logs(namespace, pod_name)
 
     async def _arun(self, tool_input: str) -> str:
         """Run the tool."""
