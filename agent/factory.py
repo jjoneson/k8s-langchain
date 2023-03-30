@@ -9,9 +9,11 @@ from tempfile import NamedTemporaryFile
 from slack_sdk import WebClient
 from agent.toolkits.base import create_k8s_engineer_agent
 from agent.toolkits.toolkit import K8sEngineerToolkit
+from doc_indexes.k8s_index import KubernetesIndex
 from tools.git_integrator.tool import GitModel
 from tools.gitlab_integration.tool import GitlabModel
 from tools.k8s_explorer.tool import KubernetesOpsModel
+from tools.k8s_sme.tools import KubernetesSMEModel
 from tools.slack_integration.tool import SlackModel
 from langchain.chat_models import ChatOpenAI
 from langchain.agents.agent import AgentExecutor
@@ -38,12 +40,17 @@ class AgentFactory:
         slack_client = WebClient(token=slack_token)
         slack_channel = os.environ["SLACK_CHANNEL_ID"]
         self.slack_model = SlackModel(client=slack_client, channel=slack_channel)
-    
+
+        k8s_doc_url = os.getenv("K8S_DOC_URL", "https://github.com/dohsimpson/kubernetes-doc-pdf/raw/master/PDFs/Reference.pdf")
+        k8s_index = KubernetesIndex(doc_url=k8s_doc_url)
+        self.k8s_sme_model = KubernetesSMEModel(index=k8s_index)
+
         self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048)
+
 
     def new_k8s_engineer(self, handlers: List[BaseCallbackHandler]) -> AgentExecutor:
         cm = CallbackManager(handlers=handlers)
-        k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=self.llm, k8s_model=self.k8s_model, git_model=self.git_model, gitlab_model=self.gitlab_model, slack_model=self.slack_model, callback_manager=cm,  verbose=True)
+        k8s_engineer_toolkit = K8sEngineerToolkit.from_llm(llm=self.llm, k8s_model=self.k8s_model, git_model=self.git_model, gitlab_model=self.gitlab_model, slack_model=self.slack_model, k8s_sme_model=self.k8s_sme_model, callback_manager=cm,  verbose=True)
         return create_k8s_engineer_agent(llm=self.llm, toolkit = k8s_engineer_toolkit, callback_manager=cm, verbose=True)
         
     

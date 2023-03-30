@@ -1,4 +1,3 @@
-import os
 from slack_sdk import WebClient
 from langchain.tools.base import BaseTool
 from pydantic import BaseModel

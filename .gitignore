@@ -1,3 +1,4 @@
 .env
 spec.json
 **/__pycache__/
+k8s_index/

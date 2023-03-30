@@ -1,7 +1,11 @@
 langchain
 kubernetes
 google-api-python-client
-google-api-client
 pygit2
 python-gitlab
 slack_sdk
+chromadb
+unstructured[local-inference]
+git+https://github.com/facebookresearch/detectron2.git
+poppler-utils
+

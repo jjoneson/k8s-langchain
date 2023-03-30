@@ -1,5 +1,19 @@
 # A [LangChain Agent](https://github.com/hwchase17/langchain) for interacting with Kubernetes Clusters using Large Language Models
 
+## Requirements
+
+For indexing PDFs:
+- poppler
+
+on Mac:
+```bash
+brew install poppler
+```
+on Ubuntu:
+```bash
+sudo apt-get install poppler-utils
+```
+
 ## Capabilities
   - Connect to a remote GKE Cluster
   - Supports most of core, apps, batch, networking, and rbac API groups
