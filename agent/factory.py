@@ -21,7 +21,7 @@ from langchain.callbacks.base import CallbackManager, BaseCallbackHandler
 
 
 class AgentFactory:
-    def __init__(self):
+    def __init__(self, model_name: str = "gpt-4"):
         self.k8s_model = KubernetesOpsModel.from_k8s_client(
             k8s_client=kubernetes_api(get_cluster()))
 
@@ -47,7 +47,7 @@ class AgentFactory:
         self.k8s_sme_model = KubernetesSMEModel(index=k8s_index)
 
         self.llm = ChatOpenAI(
-            temperature=0, model_name="gpt-4", max_tokens=1024)
+            temperature=0, model_name=model_name, max_tokens=1024)
 
     def new_k8s_engineer(self, handlers: List[BaseCallbackHandler], slack_channel: str = None, slack_thread_ts: str = None) -> AgentExecutor: 
         cm = CallbackManager(handlers=handlers) if handlers else None

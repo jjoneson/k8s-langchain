@@ -6,6 +6,7 @@ from langchain.llms.base import BaseLLM
 from langchain.callbacks.base import BaseCallbackManager
 from langchain.agents.mrkl.base import ZeroShotAgent
 from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS
+from agent.mkrl_chat.agent import ZeroShotChatAgent
 
 from agent.toolkits.prompt import K8S_ENGINEER_PREFIX, K8S_ENGINEER_SUFFIX
 from agent.toolkits.toolkit import K8sEngineerToolkit
@@ -23,7 +24,7 @@ def create_k8s_engineer_agent(
 ) -> AgentExecutor:
     """Create an agent for performing kubernetes engineering tasks."""
     tools = toolkit.get_tools()
-    prompt = ZeroShotAgent.create_prompt(tools=tools,
+    prompt = ZeroShotChatAgent.create_chat_prompt(tools=tools,
                                          prefix=prefix,
                                          suffix=suffix,
                                          format_instructions=format_instructions,
@@ -34,7 +35,7 @@ def create_k8s_engineer_agent(
                          callback_manager=callback_manager,
                          )
     tool_names = [tool.name for tool in tools]
-    agent = ZeroShotAgent(llm_chain=llm_chain,
+    agent = ZeroShotChatAgent(llm_chain=llm_chain,
                           allowed_tools=tool_names, return_intermediate_steps=True, **kwargs)
     return AgentExecutor.from_agent_and_tools(agent=agent, tools=toolkit.get_tools(), verbose=verbose, callback_manager=callback_manager, return_intermediate_steps=True,)
     
