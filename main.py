@@ -8,7 +8,11 @@ from langchain.requests import RequestsWrapper
 from langchain.tools.json.tool import JsonSpec
 import googleapiclient.discovery
 from tempfile import NamedTemporaryFile
-from kubernetes import config, client
+from kubernetes import  client
+from agent.base import create_kubernetes_agent
+from agent.toolkit import K8sOperationsToolkit
+
+from tools.k8s_operations.tool import KubernetesOpsModel
 
 llm = OpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=1024)
 
@@ -46,55 +50,11 @@ def get_cluster():
     return cluster
 
 
-def get_spec() -> dict:
-    cluster = get_cluster()
-    api_client = kubernetes_api(cluster)
-    return api_client.call_api("/openapi/v2",
-                                "GET",
-                                path_params={},
-                                query_params=[],
-                                header_params={},
-                                body=None,
-                                post_params=[],
-                                files={},
-                                auth_settings=['BearerToken'],
-                                _preload_content=False,
-                                _return_http_data_only=True)
+model = KubernetesOpsModel.from_k8s_client(k8s_client=kubernetes_api(get_cluster()))
+toolkit = K8sOperationsToolkit(model=model)
+k8s_agent = create_kubernetes_agent(llm=llm, toolkit=toolkit,  verbose=True)
 
-
-# create a json spec from the response
-resp = get_spec()
-text = resp.data.decode("utf-8")
-
-# write response to file
-with open("spec.json", "w") as f:
-    f.write(text)
-# resp[0] is a json string, so we need to convert it to a dict
-json_dict = json.loads(text)
-
-
-### Remove some stuff from the spec that we don't want to use
-
-# remove the swagger key
-json_dict.pop("swagger")
-
-# remove every key under paths that does not begin with '/api/v1'
-paths = json_dict["paths"]
-for key in list(paths.keys()):
-    if not key.startswith("/api/v1"):
-        paths.pop(key)
-
-
-json_spec = JsonSpec(dict_=json_dict, max_value_length=4000)
-
-headers = {
-    "Authorization" : f"Bearer {os.getenv('OPENAI_API_KEY')}"
-}
-requests_wrapper = RequestsWrapper(headers=headers)
-openapi_toolkit = OpenAPIToolkit.from_llm(llm=llm, json_spec=json_spec,requests_wrapper=requests_wrapper, verbose=True)
-openapi_agent_executor = create_openapi_agent(llm=llm, toolkit=openapi_toolkit, verbose=True)
-
-openapi_agent_executor.run("Get all of the pods from the test-bed namespace.")
+k8s_agent.run("get the gitlab runner deployment in the gitlab-runner namespace")
 
 
 

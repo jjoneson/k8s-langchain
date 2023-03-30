@@ -8,12 +8,12 @@ from langchain.agents.mrkl.base import ZeroShotAgent
 from langchain.agents.mrkl.prompt import FORMAT_INSTRUCTIONS
 from agent.prompt import K8S_PREFIX, K8S_SUFFIX
 
-from agent.toolkit import K8sToolkit
+from agent.toolkit import K8sOperationsToolkit
 
 
 def create_kubernetes_agent(
         llm: BaseLLM,
-        toolkit: K8sToolkit,
+        toolkit: K8sOperationsToolkit,
         callback_manager: Optional[BaseCallbackManager] = None,
         prefix: str = K8S_PREFIX,
         suffix: str = K8S_SUFFIX,
@@ -37,4 +37,4 @@ def create_kubernetes_agent(
     tool_names = [tool.name for tool in tools]
     agent = ZeroShotAgent(llm_chain=llm_chain,
                           allowed_tools=tool_names, **kwargs)
-    return AgentExecutor(agent=agent, tools=toolkit.get_tools(), verbose=verbose)
+    return AgentExecutor.from_agent_and_tools(agent=agent, tools=toolkit.get_tools(), verbose=verbose)
