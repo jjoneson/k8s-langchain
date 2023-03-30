@@ -6,7 +6,6 @@
   - Get a service object
 
 ## Required Env Vars
-|----------------------------|-----------------------------|
 | Name | Description |
 |----------------------------|-----------------------------|
 | OPENAI_API_KEY | API Key for OpenAI API |
@@ -15,7 +14,7 @@
 | GOOGLE_REGION | Region for GCP |
 | GOOGLE_CLUSTER_ID | Cluster Name for GCP |
 
-This assume that you are running locally and are able to auth by running
+This assumes that you are running locally and are able to authenticate by running:
 ```bash
 gcloud auth application-default login
 ```
@@ -54,8 +53,6 @@ metadata:
     release: gitlab-runner
   name: gitlab-runner
   namespace: gitlab-runner
-  resource_version: '6828990'
-  uid: 91792d20-f0a3-4861-91ff-0edad1ba066a
 spec:
   progress_deadline_seconds: 600
   revision_history_limit: 10
