@@ -15,7 +15,8 @@ Fourth, determine the name of the object you are interacting with. This is diffe
 
 Fifth, execute the operation needed to perform the task. If there are any fields, ensure that you are using the correct fields and values for the operation.
 
-Be sure to always add an Action Input.  If no input makes sense, use None.
+If you are having trouble finding something, try looking in a different namespace.
+Be sure to always add an Action Input.  If no input makes sense, use None.  Never use None as an Action though.  If you can't figure out the action say I don't know.
 """
 
 K8S_SUFFIX = """Begin!"

@@ -39,11 +39,11 @@ class K8sEngineerToolkit(BaseToolkit):
 
     def get_tools(self) -> List[BaseTool]:
         """Get the tools in the toolkit."""
-        git_agent_tool = Tool(
-            name="git_integration_agent",
-            func=self.git_agent.run,
-            description=GIT_AGENT_DESCRIPTION,
-        )
+        # git_agent_tool = Tool(
+        #     name="git_integration_agent",
+        #     func=self.git_agent.run,
+        #     description=GIT_AGENT_DESCRIPTION,
+        # )
         k8s_explorer_agent_tool = Tool(
             name="k8s_explorer_agent",
             func=self.k8s_explorer_agent.run,
@@ -59,7 +59,7 @@ class K8sEngineerToolkit(BaseToolkit):
             func=self.k8s_sme_agent.run,
             description=K8S_SME_AGENT_DESCRIPTION,
         )
-        return [git_agent_tool, k8s_explorer_agent_tool, gitlab_agent_tool, k8s_sme_agent_tool, self.slack_tool]
+        return [k8s_explorer_agent_tool, gitlab_agent_tool, k8s_sme_agent_tool, self.slack_tool]
 
     @classmethod
     def from_llm(

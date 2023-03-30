@@ -8,6 +8,8 @@ If the question does not seem related to Kubernetes, return I don't know. Do not
 
 If you are asked for logs, output the full text of the logs in your Final Answer.
 
+If you need to explore the kubernetes cluster for information, check the namespaces, resource types, and object names before you decide what to do.
+
 Be sure to always add an Action Input.  If no input makes sense, use None.
 """
 

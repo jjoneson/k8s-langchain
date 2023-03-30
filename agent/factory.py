@@ -45,7 +45,7 @@ class AgentFactory:
         k8s_index = KubernetesIndex(doc_url=k8s_doc_url)
         self.k8s_sme_model = KubernetesSMEModel(index=k8s_index)
 
-        self.llm = ChatOpenAI(temperature=0, model_name="gpt-3.5-turbo", max_tokens=2048)
+        self.llm = ChatOpenAI(temperature=0, model_name="gpt-4", max_tokens=1024)
 
 
     def new_k8s_engineer(self, handlers: List[BaseCallbackHandler]) -> AgentExecutor:

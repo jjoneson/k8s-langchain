@@ -61,7 +61,10 @@ class GitModel(BaseModel):
     def create_branch(self, local_repository_path: str, branch_name: str) -> str:
         try:
             repository = self.open_repository(local_repository_path)
-            repository.branches.local.create(branch_name, repository.index.write_tree())
+            index = repository.index
+            tree = index.write_tree()
+            repository.create_reference_direct('refs/heads/' + branch_name, tree, False)
+            repository.checkout('refs/heads/' + branch_name)
             return f'Branch {branch_name} created successfully'
         except Exception as e:
             return f'Error creating branch: {e}'
@@ -69,7 +72,9 @@ class GitModel(BaseModel):
     def checkout_branch(self, local_repository_path: str, branch_name: str) -> str:
         try:
             repository = self.open_repository(local_repository_path)
-            repository.checkout(branch_name)
+            branch = repository.lookup_branch(branch_name)
+            ref = repository.lookup_reference(branch.name)
+            repository.checkout(ref)
             return f'Checked out branch {branch_name} successfully'
         except Exception as e:
             return f'Error checking out branch: {e}'

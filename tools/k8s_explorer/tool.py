@@ -357,8 +357,11 @@ class KubernetesGetObjectNamesTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool."""
-        namespace, resource_type = tool_input.split(",")
-        return self.model.get_resource_names(namespace, resource_type)
+        try:
+            namespace, resource_type = tool_input.split(",")
+            return self.model.get_resource_names(namespace, resource_type)
+        except Exception as e:
+            return f"Error getting resource names: {e}"
 
     async def _arun(self, tool_input: str) -> str:
         """Run the tool."""
@@ -378,8 +381,11 @@ class KubernetesGetResourceTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool."""
-        namespace, resource_type, resource_name = tool_input.split(",")
-        return self.model.get_resource(namespace, resource_type, resource_name)
+        try:
+            namespace, resource_type, resource_name = tool_input.split(",")
+            return self.model.get_resource(namespace, resource_type, resource_name)
+        except Exception as e:
+            return f"Error: {e}"
 
     async def _arun(self, tool_input: str) -> str:
         """Run the tool."""
@@ -398,16 +404,19 @@ class KubernetesGetPodNameLikeTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool."""
-        namespace, pod_name = tool_input.split(",")
-        # remove spaces
-        pod_name = pod_name.replace(" ", "")
-        resources = self.model.get_resource_list(namespace, "pods")
-        resource_names = ",".join([i.metadata.name for i in resources])
+        try:
+            namespace, pod_name = tool_input.split(",")
+            # remove spaces
+            pod_name = pod_name.replace(" ", "")
+            resources = self.model.get_resource_list(namespace, "pods")
+            resource_names = ",".join([i.metadata.name for i in resources])
 
-        for name in resource_names.split(","):
-            if name.startswith(pod_name):
-                return name
-        return "No pod found with name like: " + pod_name
+            for name in resource_names.split(","):
+                if name.startswith(pod_name):
+                    return name
+            return "No pod found with name like: " + pod_name
+        except Exception as e:
+            return f"Error: {e}"
 
     async def _arun(self, tool_input: str) -> str:
         """Run the tool."""
@@ -428,17 +437,20 @@ class KubernetesGetPodLogsTool(BaseTool):
 
     def _run(self, tool_input: str) -> str:
         """Run the tool."""
-        namespace, pod_name = tool_input.split(",")
-        resources = self.model.get_resource_list(namespace, "pods")
-        resource_names = self.model.get_running_pod_names(resources)
-        # remove spaces
-        pod_name = pod_name.replace(" ", "")
-        for name in resource_names.split(","):
-            if name.startswith(pod_name):
-                pod_name = name
-            else:
-                return "No pod found with name like: " + pod_name
-        return self.model.get_logs(namespace, pod_name)
+        try:
+            namespace, pod_name = tool_input.split(",")
+            resources = self.model.get_resource_list(namespace, "pods")
+            resource_names = self.model.get_running_pod_names(resources)
+            # remove spaces
+            pod_name = pod_name.replace(" ", "")
+            for name in resource_names.split(","):
+                if name.startswith(pod_name):
+                    pod_name = name
+                else:
+                    return "No pod found with name like: " + pod_name
+            return self.model.get_logs(namespace, pod_name)
+        except Exception as e:
+            return f"Error: {e}"
 
     async def _arun(self, tool_input: str) -> str:
         """Run the tool."""
