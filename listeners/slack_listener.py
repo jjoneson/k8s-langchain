@@ -1,5 +1,6 @@
 import os
 import threading
+from typing import List, Sequence
 
 from slack_sdk.web import WebClient
 from slack_sdk.socket_mode import SocketModeClient
@@ -21,7 +22,7 @@ class SlackListener(AgentListener):
         
         )
         
-    def on_message(self, message) -> str:
+    def on_message(self, message) -> dict:
         res = self.agent({"input": message})
         return parse_intermediate_steps_into_slack_message(res["intermediate_steps"])
 
@@ -47,11 +48,15 @@ class SlackListener(AgentListener):
             # Add a reaction to the message if it's a new message
             if req.payload["event"]["type"] == "message" or req.payload["event"]["type"] == "app_mention"\
                 and req.payload["event"].get("subtype") is None:
+                # ignore messages from the bot itself
+                if req.payload["event"]["user"] == client.web_client.auth_test()["user_id"]:
+                    return
                 # client.web_client.reactions_add(
                 #     name="eyes",
                 #     channel=req.payload["event"]["channel"],
                 #     timestamp=req.payload["event"]["ts"],
                 # )
+                
                 # reply to the message with an acknowledgement
                 
                 client.web_client.chat_postMessage(
@@ -67,11 +72,10 @@ class SlackListener(AgentListener):
                 
                 reply = self.on_message(message)
                 # the reply has newlines as literal \n, so we need to replace them with actual newlines
-                reply = reply.replace("\\n", "\n")
                 client.web_client.chat_postMessage(
                     channel=req.payload["event"]["channel"],
                     thread_ts=req.payload["event"]["ts"],
-                    text=reply)
+                    blocks=reply['blocks'])
         if req.type == "interactive" \
             and req.payload.get("type") == "shortcut":
             if req.payload["callback_id"] == "hello-shortcut":
@@ -113,13 +117,44 @@ class SlackListener(AgentListener):
 
 
 
-def parse_intermediate_steps_into_slack_message(steps) -> str:
+def parse_intermediate_steps_into_slack_message(steps) -> dict:
     """steps is a NamedTuple with fields that looks like this:
     [(AgentAction(tool='Search', tool_input='Leo DiCaprio girlfriend', log=' I should look up who Leo DiCaprio is dating\nAction: Search\nAction Input: "Leo DiCaprio girlfriend"'), 'Camila Morrone'), (AgentAction(tool='Search', tool_input='Camila Morrone age', log=' I should look up how old Camila Morrone is\nAction: Search\nAction Input: "Camila Morrone age"'), '25 years'), (AgentAction(tool='Calculator', tool_input='25^0.43', log=' I should calculate what 25 years raised to the 0.43 power is\nAction: Calculator\nAction Input: 25^0.43'), 'Answer: 3.991298452658078\n')]
     """
-    message = ""
+    message = {}
+    message['blocks'] = []
     for step in steps:
-        message += f"{step[0].log}\n"
-        message += f"Answer: {step[1]}\n"
+        message['blocks'].extend(create_message_block(step))
     return message
+
+def create_message_block(step) -> Sequence[dict]:
+    """step is a NamedTuple with fields that looks like this:
+    (AgentAction(tool='Search', tool_input='Leo DiCaprio girlfriend', log=' I should look up who Leo DiCaprio is dating\nAction: Search\nAction Input: "Leo DiCaprio girlfriend"'), 'Camila Morrone')
+    """
+    block = []
+    tool = step[0].tool.replace("\\n", "\n")
+    block.append({
+        "type": "header",
+        "text": {
+            "type": "plain_text",
+            "text": f'Action: {tool}'
+        }
+    })
+    tool_input = step[0].tool_input.replace("\\n", "\n")
+    block.append({
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": f'*Action Input:*\n{tool_input}'
+        }
+    })
+    answer = step[1].replace("\\n", "\n")
+    block.append({
+        "type": "section",
+        "text": {
+            "type": "mrkdwn",
+            "text": f'*Answer:*\n```{answer}```'
+        }
+    })
+    return block
 

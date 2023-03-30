@@ -15,10 +15,14 @@ class GitModel(BaseModel):
     
     def clone_repository(self, remote_repository_url: str) -> str:
         try:
-            local_repository_path = remote_repository_url.split('//')[1].split('/')[1]
+            # local repository path should be everything after the first slash after the first double slash
+            # example remote_repository_url: https://github.com/jjoneson/langchain.git
+            # example local_repository_path: jjoneson/langchain
+            local_repository_path = remote_repository_url.split('//')[1].split('/')[1:]
+            local_repository_path = '/'.join(local_repository_path)
             remote_repository_url = remote_repository_url.replace('https://', f'https://{self.username}:{self.password}@')
             pygit2.clone_repository(remote_repository_url, local_repository_path)
-            return local_repository_path
+            return f'Repository cloned to {local_repository_path}'
         except Exception as e:
             return f'Error cloning repository: {e}'
         
@@ -41,7 +45,7 @@ class GitModel(BaseModel):
         try:
             repository = self.open_repository(local_repository_path)
             repository.index.add_all()
-            repository.create_commit('HEAD', repository.default_signature, repository.default_signature, message, repository.head.get_object().tree, [])
+            repository.create_commit('HEAD', repository.default_signature, repository.default_signature, message, repository.index.write_tree(), [])
             return f'Commit {message} created successfully'
         except Exception as e:
             return f'Error creating commit: {e}'
@@ -57,8 +61,8 @@ class GitModel(BaseModel):
     def create_branch(self, local_repository_path: str, branch_name: str) -> str:
         try:
             repository = self.open_repository(local_repository_path)
-            repository.create_branch(branch_name, repository.head.get_object())
-            return branch_name
+            repository.branches.local.create(branch_name, repository.index.write_tree())
+            return f'Branch {branch_name} created successfully'
         except Exception as e:
             return f'Error creating branch: {e}'
     
